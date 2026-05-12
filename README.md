@@ -1,96 +1,96 @@
-# GNN para Ligação Chave-Valor em Documentos
+# GNN for Key-Value Pair Linking in Documents
 
-Implementação e scripts experimentais para extração de pares chave-valor em documentos digitalizados usando uma GNN leve com construção seletiva de arestas. O repositório também inclui componentes auxiliares de normalização semântica, tabelas e validação de pipeline usados no trabalho.
+Experimental scripts for extracting key-value pairs from digitized documents using a lightweight GNN with selective edge construction. The repository also includes supporting components for semantic normalization, table processing, and pipeline validation used around the main KVP-linking experiments.
 
-**Autores:** Gabriel Sichelero e Ricardo Dutra da Silva.
+**Authors:** Gabriel Sichelero and Ricardo Dutra da Silva.
 
-![Pipeline tecnico](assets/pipeline_architecture_paper.png)
+![Technical pipeline](assets/pipeline_architecture_paper.png)
 
-## Objetivo
+## Objective
 
-Este repositório reúne os principais scripts de implementação e experimentação, com foco principal na GNN para ligação chave-valor em datasets públicos como FUNSD e WildReceipt. A organização separa o código dos dados.
+This repository collects the main implementation and experiment scripts, with the primary focus on GNN-based key-value pair linking on public datasets such as FUNSD and WildReceipt. Code is kept separate from datasets, trained checkpoints, and large experiment outputs.
 
-Não foram incluídos datasets, checkpoints de modelos, arquivos de saída volumosos ou documentos privados. As imagens presentes em `assets/` são figuras explicativas ou exemplos anonimizados usados para contextualizar o README.
+Datasets, model checkpoints, large generated outputs, and private documents are not included. Images under `assets/` are explanatory figures or anonymized examples used to contextualize the repository.
 
-## Visão Geral
+## Overview
 
-![Exemplo anonimo de anotacoes KVP](assets/invoice_kvp_annotations_anon.png)
+![Anonymized KVP annotation example](assets/invoice_kvp_annotations_anon.png)
 
-O núcleo do trabalho é o modelo GNN que representa cada documento como um grafo: blocos de texto são nós e relações candidatas chave-valor são arestas. A construção seletiva reduz pares semanticamente improváveis e concentra o treinamento em ligações `question/header -> answer/other`.
+The core contribution is a GNN model that represents each document as a graph: text blocks are nodes, and candidate key-value relations are edges. Selective edge construction removes semantically unlikely pairs and focuses training on `question/header -> answer/other` links.
 
-No pipeline completo, a GNN aparece como o estágio central de ligação KVP:
+In the full document-processing pipeline, the GNN is the central KVP-linking stage:
 
-1. segmentação/localização de regiões do documento;
-2. OCR para obter texto e coordenadas;
-3. ligação chave-valor com a GNN proposta;
-4. reconhecimento de estrutura de tabelas;
-5. normalização semântica para categorias padronizadas;
-6. saída estruturada em JSON.
+1. region segmentation;
+2. OCR to obtain text and coordinates;
+3. key-value pair linking with the proposed GNN;
+4. table structure recognition;
+5. semantic normalization into standardized categories;
+6. structured JSON output.
 
-## Principais Scripts
+## Main Scripts
 
-| Arquivo | Função |
+| File | Purpose |
 | --- | --- |
-| `scripts/kvp_gnn_cross_dataset.py` | Experimentos de GNN para ligação chave-valor, incluindo conversão WildReceipt -> formato FUNSD, treinamento combinado FUNSD+WildReceipt e avaliação cross-dataset. |
-| `scripts/kv_extractor_ml.py` | Módulo de apoio para extração e organização de pares chave-valor usados pelo pipeline. |
-| `scripts/semantic_normalization_suite.py` | Testes de normalização de valores extraídos, incluindo datas, valores monetários, números e classificação semântica. |
-| `scripts/semantic_normalization_gt_context.py` | Treinamento de embeddings semânticos usando contexto de ground truth, pares KVP e cabeçalhos/linhas de tabelas. |
-| `scripts/invoice_categories.py` | Vocabulário leve de categorias semânticas de faturas, usado pela normalização sem importar scripts pesados. |
-| `scripts/unified_document_pipeline.py` | Pipeline completo de OCR, detecção de tabelas, extração KVP, classificação e exportação dos resultados. |
-| `scripts/test_full_pipeline.py` | Script de validação ponta a ponta em imagens de faturas, com visualizações de OCR, tabelas, KVPs e categorias. |
-| `scripts/run_full_pipeline_with_semantic_context.py` | Orquestrador para treinar a normalização com contexto e rodar avaliação/visualizações do pipeline. |
-| `scripts/table_structure_detector.py` | Módulo de detecção e reconhecimento de estrutura de tabelas. |
-| `scripts/locator_classifier.py` | Classificador auxiliar usado na etapa de categorização do pipeline integrado. |
+| `scripts/kvp_gnn_cross_dataset.py` | GNN experiments for key-value pair linking, including WildReceipt -> FUNSD conversion, FUNSD+WildReceipt combined training, and cross-dataset evaluation. |
+| `scripts/kv_extractor_ml.py` | Support module for extracting and organizing key-value pairs used by the pipeline. |
+| `scripts/semantic_normalization_suite.py` | Tests for value normalization, including dates, monetary values, numbers, and semantic classification. |
+| `scripts/semantic_normalization_gt_context.py` | Trains semantic embeddings with ground-truth context from KVP pairs and table headers/rows. |
+| `scripts/invoice_categories.py` | Lightweight vocabulary of invoice semantic categories used by the normalization scripts. |
+| `scripts/unified_document_pipeline.py` | Integrated OCR, table detection, KVP extraction, classification, and result-export pipeline. |
+| `scripts/test_full_pipeline.py` | End-to-end validation script for document images, with OCR, table, KVP, and category visualizations. |
+| `scripts/run_full_pipeline_with_semantic_context.py` | Runner for semantic-context training plus optional evaluation and visualization steps. |
+| `scripts/table_structure_detector.py` | Table detection and table-structure recognition module. |
+| `scripts/locator_classifier.py` | Auxiliary classifier used by the integrated categorization stage. |
 
-## Resultados de Referência
+## Reference Results
 
-Resultados da GNN nos benchmarks públicos de ligação chave-valor:
+GNN results on public KVP-linking benchmarks:
 
-| Configuração | Resultado reportado |
+| Setting | Reported result |
 | --- | --- |
-| GNN treinada e testada no FUNSD | F1 = 0,772 com aproximadamente 890K parâmetros |
-| GNN treinada em FUNSD+WildReceipt e testada no FUNSD | F1 = 0,832 |
-| GNN treinada em FUNSD+WildReceipt e testada no WildReceipt | F1 = 0,721 |
+| GNN trained and tested on FUNSD | F1 = 0.772 with approximately 890K parameters |
+| GNN trained on FUNSD+WildReceipt and tested on FUNSD | F1 = 0.832 |
+| GNN trained on FUNSD+WildReceipt and tested on WildReceipt | F1 = 0.721 |
 
-![Protocolo publico de avaliacao KVP](assets/kvp_public_protocol_paper.png)
+![Public KVP evaluation protocol](assets/kvp_public_protocol_paper.png)
 
-## Como Executar
+## How to Run
 
-Instale as dependências principais:
+Install the main dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Exemplos de execução a partir da raiz do projeto:
+Example commands from the repository root:
 
 ```bash
 python scripts/kvp_gnn_cross_dataset.py
 python scripts/semantic_normalization_suite.py
-python scripts/test_full_pipeline.py --image caminho/para/fatura.png --output pipeline_results
+python scripts/test_full_pipeline.py --image path/to/document.png --output pipeline_results
 ```
 
-Por padrão, os scripts assumem que estão sendo executados a partir da raiz deste repositório. Para apontar dados externos ou uma estrutura local diferente, defina:
+By default, scripts assume they are being run from this repository root. To point them to external data or a different local layout, define:
 
 ```bash
-set DOCUMENT_KVP_PROJECT_ROOT=C:\caminho\para\repositorio-ou-dados
-set KVP_DATASETS_DIR=C:\caminho\para\datasets_kvp
+set DOCUMENT_KVP_PROJECT_ROOT=C:\path\to\repository-or-data
+set KVP_DATASETS_DIR=C:\path\to\kvp_datasets
 ```
 
-No Linux/macOS, use `export` em vez de `set`.
+On Linux/macOS, use `export` instead of `set`.
 
-## Dados Esperados
+## Expected Data
 
-Os scripts podem utilizar os seguintes dados externos quando executados integralmente:
+Full experiment runs may require external data such as:
 
 - FUNSD;
 - WildReceipt;
-- imagens/anotações de faturas usadas nos experimentos internos;
-- checkpoints treinados previamente, quando o modo de avaliação exigir.
+- document images and annotations used in local pipeline experiments;
+- previously trained checkpoints when running evaluation-only modes.
 
-Esses arquivos não são redistribuídos aqui. A pasta foi intencionalmente limitada à contribuição de código, documentação e figuras leves.
+These files are not redistributed here. This repository is intentionally limited to source code, documentation, and lightweight figures.
 
-## Estrutura
+## Structure
 
 ```text
 .
