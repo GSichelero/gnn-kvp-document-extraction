@@ -1,0 +1,14 @@
+numpy
+pandas
+pillow
+opencv-python
+scikit-learn
+matplotlib
+tqdm
+torch
+dgl
+sentence-transformers
+transformers
+easyocr
+pytesseract
+ultralytics
