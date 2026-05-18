@@ -65,18 +65,6 @@ Reported GNN results on public KVP-linking benchmarks:
 
 ![Public KVP evaluation protocol](assets/kvp_public_protocol_paper.png)
 
-## Data-Driven Configuration
-
-The main scripts avoid document-specific hardcoded field names. In particular:
-
-- `kv_extractor_ml.py` derives key-term hints from linked training annotations
-  and saves those learned terms with the model.
-- `scripts/other/invoice_categories.py` builds optional semantic-category
-  vocabularies from local ground-truth category assignment files when they are
-  available.
-- WildReceipt label conversion uses the dataset label parity convention rather
-  than a fixed list of label IDs.
-
 ## How to Run
 
 Install dependencies:
