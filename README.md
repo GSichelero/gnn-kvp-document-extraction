@@ -39,11 +39,11 @@ key/question -> value/answer edges for training and evaluation.
 
 ![WildReceipt conversion to shared KVP target](assets/kvp_shared_target_wildreceipt.png)
 
-The error example below illustrates why local geometry alone is not always
-enough: a nearby text block can look like a plausible value, while the correct
-relation depends on the text block that introduces the longer value.
+The example below shows a FUNSD document processed by the GNN for key-value
+relation prediction. Correct predicted links are shown in green, false
+positives in red, and false negatives with yellow lines.
 
-![Representative KVP error with local geometric ambiguity](assets/kvp_error_vertical_alignment.png)
+![FUNSD GNN KVP prediction example](assets/kvp_error_vertical_alignment.png)
 
 ## Main Scripts
 
