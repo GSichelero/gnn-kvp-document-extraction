@@ -8,6 +8,12 @@ benchmarks.
 
 ![Technical pipeline](assets/pipeline_architecture_paper.png)
 
+The diagram above shows the broader end-to-end document-processing pipeline
+used in the local pipeline experiments. Its OCR, table-structure, semantic
+normalization, and visualization components are kept under `scripts/other/`.
+The main reproducible path in this repository is narrower: converting public
+KVP datasets to a shared relation target and training/evaluating the GNN.
+
 ## Objective
 
 The repository is centered on two reproducible pieces:
@@ -21,6 +27,23 @@ The repository is centered on two reproducible pieces:
 Datasets, checkpoints, large generated outputs, and private documents are not
 included. The code expects local datasets to be provided through paths or
 environment variables.
+
+## KVP Relation Examples
+
+The public experiments first convert different annotation styles into the same
+directed relation target. FUNSD already provides entity links, while
+WildReceipt provides typed key/value classes. Both are represented as directed
+key/question -> value/answer edges for training and evaluation.
+
+![FUNSD conversion to shared KVP target](assets/kvp_shared_target_funsd.png)
+
+![WildReceipt conversion to shared KVP target](assets/kvp_shared_target_wildreceipt.png)
+
+The error example below illustrates why local geometry alone is not always
+enough: a nearby text block can look like a plausible value, while the correct
+relation depends on the text block that introduces the longer value.
+
+![Representative KVP error with local geometric ambiguity](assets/kvp_error_vertical_alignment.png)
 
 ## Main Scripts
 
@@ -100,7 +123,10 @@ only source code, documentation, and lightweight figures.
 |-- assets/
 |   |-- pipeline_architecture_paper.png
 |   |-- invoice_kvp_annotations_anon.png
-|   `-- kvp_public_protocol_paper.png
+|   |-- kvp_public_protocol_paper.png
+|   |-- kvp_shared_target_funsd.png
+|   |-- kvp_shared_target_wildreceipt.png
+|   `-- kvp_error_vertical_alignment.png
 `-- scripts/
     |-- kvp_gnn_cross_dataset.py
     |-- kv_extractor_ml.py
