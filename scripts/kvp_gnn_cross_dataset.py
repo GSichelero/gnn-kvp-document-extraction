@@ -52,8 +52,15 @@ except ImportError:
 # ======================================================================
 # 1. WildReceipt -> FUNSD conversion  (reuse cached data)
 # ======================================================================
-WR_KEY_LABELS   = {2,4,6,8,10,12,14,16,18,20,22,24}
-WR_VALUE_LABELS = {1,3,5,7,9,11,13,15,17,19,21,23}
+
+
+def _wr_role_and_category(label_id):
+    """Map the WildReceipt odd/even label convention to FUNSD roles."""
+    if not isinstance(label_id, int) or label_id <= 0:
+        return "other", None
+    if label_id % 2 == 0:
+        return "question", label_id // 2
+    return "answer", (label_id + 1) // 2
 
 
 def _load_wr_jsonl(path, max_samples=None):
@@ -96,17 +103,11 @@ def _convert_wr_sample(sample, wr_base, out_ann_dir, out_img_dir, idx,
         ys = [poly[i]*sy for i in range(1,8,2)]
         box = [max(0,int(min(xs))), max(0,int(min(ys))),
                min(nw,int(max(xs))), min(nh,int(max(ys)))]
-        lid = ann["label"]
-        if lid in WR_KEY_LABELS:
-            label = "question"
-            cat = lid // 2
+        label, cat = _wr_role_and_category(ann["label"])
+        if label == "question":
             cat_keys[cat].append(eid)
-        elif lid in WR_VALUE_LABELS:
-            label = "answer"
-            cat = (lid + 1) // 2
+        elif label == "answer":
             cat_values[cat].append(eid)
-        else:
-            label = "other"
         entities.append({
             "id": eid, "text": text, "label": label, "box": box,
             "words": [{"text": text, "box": box}], "linking": []

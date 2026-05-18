@@ -24,7 +24,8 @@ from pathlib import Path
 from datetime import datetime
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-CONTRIB_ROOT = SCRIPT_DIR.parent
+SCRIPTS_DIR = SCRIPT_DIR.parent
+CONTRIB_ROOT = SCRIPTS_DIR.parent
 PROJECT = Path(os.environ.get("DOCUMENT_KVP_PROJECT_ROOT", CONTRIB_ROOT)).resolve()
 sys.path.insert(0, str(SCRIPT_DIR))
 PY = sys.executable
@@ -45,7 +46,7 @@ def run_cmd(cmd, cwd=None):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--full-eval", action="store_true", help="Run the invoice evaluation script after retraining")
+    parser.add_argument("--full-eval", action="store_true", help="Run an optional local evaluation script after retraining")
     parser.add_argument("--eval-script", default=os.environ.get("INVOICE_EVAL_SCRIPT", "invoice_eval_only.py"))
     parser.add_argument("--skip-visuals", action="store_true", help="Skip visualization scripts")
     args = parser.parse_args()
@@ -59,7 +60,7 @@ def main():
     # Step 1: semantic training with context
     print("[1/3] Training semantic normalization with GT context...")
     t0 = time.time()
-    from train_semantic_norm_with_gt_context import train_from_gt_context
+    from semantic_normalization_gt_context import train_from_gt_context
     train_result = train_from_gt_context(verbose=True)
     report["steps"].append({
         "step": "train_semantic_with_gt_context",

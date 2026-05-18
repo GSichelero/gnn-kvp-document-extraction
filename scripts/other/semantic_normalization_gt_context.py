@@ -21,10 +21,11 @@ import torch
 import torch.nn.functional as F
 from sentence_transformers import SentenceTransformer
 
-from invoice_categories import INVOICE_CATEGORIES
+from invoice_categories import build_category_vocabulary
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-CONTRIB_ROOT = SCRIPT_DIR.parent
+SCRIPTS_DIR = SCRIPT_DIR.parent
+CONTRIB_ROOT = SCRIPTS_DIR.parent
 PROJECT_ROOT = Path(os.environ.get("DOCUMENT_KVP_PROJECT_ROOT", CONTRIB_ROOT)).resolve()
 GT_BASE = Path(
     os.environ.get(
@@ -189,6 +190,8 @@ def build_kvp_context(entity, entities_by_id):
 
 
 def iter_assignment_files():
+    if not GT_BASE.exists():
+        return
     for dist_dir in GT_BASE.iterdir():
         if not dist_dir.is_dir() or dist_dir.name in {"xlsx_items", "category_gt", "annotations"}:
             continue
@@ -288,17 +291,24 @@ def gather_examples():
 def train_embeddings_from_examples(examples):
     st_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-    cat_names = list(INVOICE_CATEGORIES.keys())
-    cat_syn_texts = [" ".join(INVOICE_CATEGORIES[c]) for c in cat_names]
-    base_embs = st_model.encode(cat_syn_texts, convert_to_tensor=True, show_progress_bar=False)
-    base_embs = F.normalize(base_embs.float(), p=2, dim=1)
-
+    category_examples = build_category_vocabulary(GT_BASE)
     by_cat = defaultdict(list)
     for ex in examples:
         c = ex["category"]
         t = ex["text"]
-        if c in INVOICE_CATEGORIES and t:
+        if c and t:
             by_cat[c].append(t)
+
+    cat_names = sorted(set(category_examples) | set(by_cat))
+    if not cat_names:
+        return [], torch.empty((0, 384)), by_cat
+
+    cat_syn_texts = [
+        " ".join(category_examples.get(c) or [c.replace("_", " ")])
+        for c in cat_names
+    ]
+    base_embs = st_model.encode(cat_syn_texts, convert_to_tensor=True, show_progress_bar=False)
+    base_embs = F.normalize(base_embs.float(), p=2, dim=1)
 
     adjusted = base_embs.clone()
     for i, cat in enumerate(cat_names):
