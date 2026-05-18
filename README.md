@@ -50,7 +50,7 @@ positives in red, and false negatives with yellow lines.
 | File | Purpose |
 | --- | --- |
 | `scripts/kvp_gnn_cross_dataset.py` | Main experiment script. Converts WildReceipt to a FUNSD-style layout, trains/tests the custom GNN, and runs FUNSD/WildReceipt cross-dataset evaluation. |
-| `scripts/kv_extractor_ml.py` | Support extractor for FUNSD-style annotations. It learns vocabulary and key-like terms from the training annotations instead of using fixed invoice keywords. |
+| `scripts/kv_extractor_ml.py` | Support extractor for FUNSD-style annotations. |
 | `scripts/other/` | Auxiliary local-pipeline scripts for OCR, semantic normalization, tables, and legacy invoice experiments. They are kept for reference, but are not the main reproduction path. |
 
 ## Reference Results
@@ -100,7 +100,7 @@ Full experiment runs may require:
 - optional previously trained checkpoints for evaluation-only runs.
 
 These files are not redistributed here. This repository intentionally contains
-only source code, documentation, and lightweight figures.
+only source code, documentation, and figures.
 
 ## Structure
 
